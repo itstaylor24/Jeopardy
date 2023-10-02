@@ -25,14 +25,7 @@ let categories = [];
  * Returns array of category ids
  */
 
-async function getCategoryIds(arr) {
-  const categoryIds = [];
-  arr = await setupAndStart();
-  for (let idNum of arr) {
-    categoryIds.push(idNum.id);
-  }
-  return categoryIds;
-}
+function getCategoryIds() {}
 
 /** Return object with data about a category:
  
@@ -46,15 +39,7 @@ async function getCategoryIds(arr) {
  *   ]
  */
 
-async function getCategory(catId) {
-  newArr = await setupAndStart();
-
-  for (let cat of newArr) {
-    if (cat.id === catId) {
-      return cat;
-    }
-  }
-}
+function getCategory(catId) {}
 
 /** Fill the HTML table#jeopardy with the categories & cells for questions.
  *
@@ -64,7 +49,85 @@ async function getCategory(catId) {
  *   (initally, just show a "?" where the question/answer would go.)
  */
 
-async function fillTable() {}
+async function fillTable(HTMLdata) {
+  HTMLdata = await setupAndStart();
+
+  const table = $("table");
+  const tHead = $("<thead>");
+  const trHead = $("<tr>");
+  const th1 = $("<th>");
+  const th2 = $("<th>");
+  const th3 = $("<th>");
+  const th4 = $("<th>");
+  const th5 = $("<th>");
+  const th6 = $("<th>");
+  const tbody = $("<tbody>");
+  const tr1 = $("<tr>");
+  const tr2 = $("<tr>");
+  const tr3 = $("<tr>");
+  const tr4 = $("<tr>");
+  const tr5 = $("<tr>");
+
+  table.append(tHead, tbody);
+  tHead.append(trHead);
+  trHead.append(th1, th2, th3, th4, th5, th6);
+  tbody.append(tr1, tr2, tr3, tr4, tr5);
+
+  ths = [th1, th2, th3, th4, th5, th6];
+
+  const categoryArr = [];
+
+  for (let i = 0; i < HTMLdata.length; i++) {
+    categoryArr.push(HTMLdata[i].title);
+    for (let j = 0; j < ths.length; j++) {
+      if (i === j) {
+        ths[j].text(`${categoryArr[i]}`);
+        ths[j].attr("id", HTMLdata[i].id);
+      }
+    }
+  }
+
+  const trs = [tr1, tr2, tr3, tr4, tr5];
+
+  for (let tr of trs) {
+    $("<td class='col-1'></td>").appendTo(tr);
+    $("<td class='col-2'></td>").appendTo(tr);
+    $("<td class='col-3'></td>").appendTo(tr);
+    $("<td class='col-4'></td>").appendTo(tr);
+    $("<td class='col-5'></td>").appendTo(tr);
+    $("<td class='col-6'></td>").appendTo(tr);
+
+    const col1 = Array.from($(".col-1"));
+
+    col1QNA = [];
+
+    const col2 = Array.from($(".col-2"));
+    col2QNA = [];
+
+    const col3 = Array.from($(".col-3"));
+    col3QNA = [];
+
+    const col4 = Array.from($(".col-4"));
+    col4QNA = [];
+
+    const col5 = Array.from($(".col-5"));
+    col5QNA = [];
+
+    const col6 = Array.from($(".col-6"));
+    col6QNA = [];
+
+    for (let clueObj of HTMLdata) {
+      const cluesInfo = clueObj.clues;
+      for (let clueInfo of cluesInfo) {
+        if ((clueInfo.showing = "null")) {
+          $("td").text("?");
+        }
+      }
+    }
+  }
+}
+
+fillTable();
 
 /** Handle clicking on a clue: show the question or answer.
  *
@@ -74,7 +137,9 @@ async function fillTable() {}
  * - if currently "answer", ignore click
  * */
 
-function handleClick(evt) {}
+function handleClick(evt) {
+  $(tbody).on("click", "td", function () {});
+}
 
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
@@ -104,103 +169,78 @@ async function setupAndStart() {
   for (let category of sixCategories) {
     // get 5 questions for this category
     const catData = await axios.get(baseUrl + "/category?id=" + category.id);
-    const clues = catData.data.clues.slice(0, 5);
+    const cluesQNA = catData.data.clues.slice(0, 5);
+
+    for (let clue of cluesQNA) {
+      clue.showing = "null";
+    }
 
     array.push({
       title: category.title,
-      clues,
+      clues: cluesQNA,
+      id: category.id,
     });
   }
-
-  const body = document.querySelector("body");
-  let ths = "";
-  for (let i = 0; i < array.length; i++) {
-    ths += `<th>${array[i].title}</th>`;
-  }
-
-  // put categories on table head
-  body.innerHTML += `
-    <table>
-       <thead>
-        <tr>
-          ${ths}
-         </tr>
-      </thead>
-  `;
-
-  body.innerHTML += "</table>";
-
-  // why += and not +?
-  console.log(array);
-  // `<table>
-  // <thead>
-  // <tr>
-  // <th></th>
-  // <th></th>
-  // <th></th>
-  // <th></th>
-  // <th></th>
-  // <th></th>
-  // </tr>
-  // </thead>
-  // <tbody>
-  // <tr>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // </tr>
-  // <tr>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // </tr>
-  // <tr><
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // /tr>
-  // <tr>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // </tr>
-  // <tr>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // </tr>
-  // <tr>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // <td></td>
-  // </tr>
-  // </tbody>
-  // </table>`;
   return array;
 }
 
-setupAndStart();
+//
 
-// function produceTH() {}
+//
 
+// tds = $("td");
+// tdArray = Array.from(tds);
+
+// const col1 = tdArray.filter(function (el) {
+//       (el.hasClass("col-1"));
+//   });
+// if (tdArray[i].hasClass("col-1")) {
+
+// }
+
+//
+
+// async function setupAndStart() {
+//   const baseUrl = "https://jservice.io/api";
+//   const res = await axios.get(baseUrl + "/categories?count=100");
+
+//   const sixCategories = _.sampleSize(res.data, 6);
+
+//   let array = [];
+
+//   for (let category of sixCategories) {
+//     // get 5 questions for this category
+//     const catData = await axios.get(baseUrl + "/category?id=" + category.id);
+//     const clues = catData.data.clues.slice(0, 5);
+
+//     array.push({
+//       title: category.title,
+//       clues,
+//       id: category.id,
+//     });
+//   }
+
+//   const body = document.querySelector("body");
+//   let ths = "";
+//   for (let i = 0; i < array.length; i++) {
+//     ths += `<th>${array[i].title}</th>`;
+//   }
+
+//   // put categories on table head
+//   body.innerHTML += `
+//     <table>
+//        <thead>
+//         <tr>
+//           ${ths}
+//          </tr>
+//       </thead>
+//   `;
+
+//   body.innerHTML += "</table>";
+//   ths = "";
+
+//
+//
 /** On page load, add event handler for clicking clues */
 
 // TODO
