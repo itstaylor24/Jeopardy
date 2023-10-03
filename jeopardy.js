@@ -49,85 +49,133 @@ function getCategory(catId) {}
  *   (initally, just show a "?" where the question/answer would go.)
  */
 
+// async function fillTable(HTMLdata) {
+//   HTMLdata = await setupAndStart();
+//   console.log(HTMLdata);
+//   const table = $("table");
+//   const tHead = $("<thead>");
+//   const trHead = $("<tr>");
+//   const th1 = $("<th>");
+//   const th2 = $("<th>");
+//   const th3 = $("<th>");
+//   const th4 = $("<th>");
+//   const th5 = $("<th>");
+//   const th6 = $("<th>");
+//   const tbody = $("<tbody>");
+//   const tr1 = $("<tr>");
+//   const tr2 = $("<tr>");
+//   const tr3 = $("<tr>");
+//   const tr4 = $("<tr>");
+//   const tr5 = $("<tr>");
+
+//   table.append(tHead, tbody);
+//   tHead.append(trHead);
+//   trHead.append(th1, th2, th3, th4, th5, th6);
+//   tbody.append(tr1, tr2, tr3, tr4, tr5);
+
+//   ths = [th1, th2, th3, th4, th5, th6];
+
+//   const categoryArr = [];
+
+//   for (let i = 0; i < HTMLdata.length; i++) {
+//     console.log(HTMLdata[i]);
+//     categoryArr.push(HTMLdata[i].title);
+//     for (let j = 0; j < ths.length; j++) {
+//       if (i === j) {
+//         ths[j].text(`${categoryArr[i]}`);
+//         ths[j].attr("id", HTMLdata[i].id);
+//       }
+//     }
+//   }
+
+//   const trs = [tr1, tr2, tr3, tr4, tr5];
+
+//   for (let tr of trs) {
+//     $("<td class='col-1'></td>").appendTo(tr);
+//     $("<td class='col-2'></td>").appendTo(tr);
+//     $("<td class='col-3'></td>").appendTo(tr);
+//     $("<td class='col-4'></td>").appendTo(tr);
+//     $("<td class='col-5'></td>").appendTo(tr);
+//     $("<td class='col-6'></td>").appendTo(tr);
+
+//     const col1 = Array.from($(".col-1"));
+
+//     col1QNA = [];
+
+//     const col2 = Array.from($(".col-2"));
+//     col2QNA = [];
+
+//     const col3 = Array.from($(".col-3"));
+//     col3QNA = [];
+
+//     const col4 = Array.from($(".col-4"));
+//     col4QNA = [];
+
+//     const col5 = Array.from($(".col-5"));
+//     col5QNA = [];
+
+//     const col6 = Array.from($(".col-6"));
+//     col6QNA = [];
+
+//     for (let clueObj of HTMLdata) {
+//       const cluesInfo = clueObj.clues;
+//       for (let clueInfo of cluesInfo) {
+//         if ((clueInfo.showing = "null")) {
+//           $("td").text("?");
+//         }
+//       }
+//     }
+//   }
+// }
 async function fillTable(HTMLdata) {
   HTMLdata = await setupAndStart();
-
   const table = $("table");
-  const tHead = $("<thead>");
+
+  //creating the table head
   const trHead = $("<tr>");
-  const th1 = $("<th>");
-  const th2 = $("<th>");
-  const th3 = $("<th>");
-  const th4 = $("<th>");
-  const th5 = $("<th>");
-  const th6 = $("<th>");
-  const tbody = $("<tbody>");
-  const tr1 = $("<tr>");
-  const tr2 = $("<tr>");
-  const tr3 = $("<tr>");
-  const tr4 = $("<tr>");
-  const tr5 = $("<tr>");
+  HTMLdata.forEach((d) => {
+    const th = $(`<th>${d.title}</th>`);
+    trHead.append(th);
+  });
+  table.append(trHead);
 
-  table.append(tHead, tbody);
-  tHead.append(trHead);
-  trHead.append(th1, th2, th3, th4, th5, th6);
-  tbody.append(tr1, tr2, tr3, tr4, tr5);
-
-  ths = [th1, th2, th3, th4, th5, th6];
-
-  const categoryArr = [];
+  // structure the data
+  const structuredData = [
+    [1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1],
+  ];
 
   for (let i = 0; i < HTMLdata.length; i++) {
-    categoryArr.push(HTMLdata[i].title);
-    for (let j = 0; j < ths.length; j++) {
-      if (i === j) {
-        ths[j].text(`${categoryArr[i]}`);
-        ths[j].attr("id", HTMLdata[i].id);
-      }
+    const c = HTMLdata[i];
+    for (let j = 0; j < c.clues.length; j++) {
+      structuredData[j][i] = c.clues[j];
     }
   }
 
-  const trs = [tr1, tr2, tr3, tr4, tr5];
+  // obendesmond2@gmail
 
-  for (let tr of trs) {
-    $("<td class='col-1'></td>").appendTo(tr);
-    $("<td class='col-2'></td>").appendTo(tr);
-    $("<td class='col-3'></td>").appendTo(tr);
-    $("<td class='col-4'></td>").appendTo(tr);
-    $("<td class='col-5'></td>").appendTo(tr);
-    $("<td class='col-6'></td>").appendTo(tr);
-
-    const col1 = Array.from($(".col-1"));
-
-    col1QNA = [];
-
-    const col2 = Array.from($(".col-2"));
-    col2QNA = [];
-
-    const col3 = Array.from($(".col-3"));
-    col3QNA = [];
-
-    const col4 = Array.from($(".col-4"));
-    col4QNA = [];
-
-    const col5 = Array.from($(".col-5"));
-    col5QNA = [];
-
-    const col6 = Array.from($(".col-6"));
-    col6QNA = [];
-
-    for (let clueObj of HTMLdata) {
-      const cluesInfo = clueObj.clues;
-      for (let clueInfo of cluesInfo) {
-        if ((clueInfo.showing = "null")) {
-          $("td").text("?");
-        }
-      }
-    }
-  }
+  structuredData.forEach((d) => {
+    const trRow = $("<tr>");
+    d.forEach((clue) => {
+      const th = $(`<td>
+        <div><p class="mark">?</p></div>
+      </td>`);
+      trRow.append(th);
+    });
+    table.append(trRow);
+  });
 }
+// $(`<td>
+//        <div><p class="mark">?</p></div>
+//       </td>`);
+// `<td>${clue.question}<td>`;
+// `<td>${clue.answer}<td>`;
 
 fillTable();
+//
 
 /** Handle clicking on a clue: show the question or answer.
  *
@@ -137,8 +185,12 @@ fillTable();
  * - if currently "answer", ignore click
  * */
 
+// input.addEventListener("keyup", searchHandler);
+
+// suggestions.addEventListener("click", useSuggestion);
+
 function handleClick(evt) {
-  $(tbody).on("click", "td", function () {});
+  $("td").on("click", fillTable);
 }
 
 /** Wipe the current Jeopardy board, show the loading spinner,
@@ -181,6 +233,17 @@ async function setupAndStart() {
       id: category.id,
     });
   }
+
+  // prepend table as first child of body
+  const table = $("<table>");
+  $("body").prepend(table);
+
+  // add heading and button
+  const h1 = $("<h1>Jeopardy!</h1>");
+  const btn = $("<button>Start!</button>");
+  $("body").prepend(btn);
+  $("body").prepend(h1);
+
   return array;
 }
 
