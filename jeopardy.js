@@ -160,9 +160,7 @@ async function fillTable(HTMLdata) {
   structuredData.forEach((d) => {
     const trRow = $("<tr>");
     d.forEach((clue) => {
-      const th = $(`<td>
-        <div><p class="mark">?</p></div>
-      </td>`);
+      const th = `<td>${clue.question}<td>`;
       trRow.append(th);
     });
     table.append(trRow);
