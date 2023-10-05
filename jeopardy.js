@@ -183,20 +183,12 @@ async function fillTable() {
     table.append(trRow);
   });
 
-  console.log(structuredData);
   return structuredData;
 }
+// `${clue.question}`;
+// `${clue.answer}`;
 
 fillTable();
-
-// $(`<td>
-//        <div><p class="mark">?</p></div>
-//       </td>`);
-// `<td >${clue.question}<td>`;
-// `<td>${clue.answer}<td>`;
-
-// fillTable();
-//
 
 /** Handle clicking on a clue: show the question or answer.
  *
@@ -207,30 +199,27 @@ fillTable();
  * */
 
 async function handleClick(evt) {
-  let td = evt.target.td;
+  $("td").on("click", function () {
+    console.log("clicked!");
 
-  if (structuredData[j][i].showing === "null") {
-    td.innerHTML === "?";
-  }
+    if (structuredData[j][i].showing === "null") {
+      td.innerHTML === "?";
+    }
 
-  if (td.innerHTML === "?") {
-    td.innerHTML = structuredData[j][i].question;
-    structuredData[j][i].showing = "question";
-  }
-  if ((td.innerHTML = structuredData[j][i].question)) {
-    td.innerHTML = structuredData[j][i].answer;
-    structuredData[j][i].showing = "answer";
-  } else {
-    return;
-  }
+    if (td.innerHTML === "?") {
+      td.innerHTML = structuredData[j][i].question;
+      structuredData[j][i].showing = "question";
+    }
+    if ((td.innerHTML = structuredData[j][i].question)) {
+      td.innerHTML = structuredData[j][i].answer;
+      structuredData[j][i].showing = "answer";
+    } else {
+      return;
+    }
+  });
 }
 
 handleClick();
-async function start() {
-  $("body").on("click", "td", (evt) => {
-    handleClick(evt);
-  });
-}
 
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
