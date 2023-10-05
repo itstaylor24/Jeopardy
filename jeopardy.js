@@ -18,14 +18,30 @@
 //    ...
 //  ]
 
-let categories = [];
+let categoriesArr = [];
+
+let structuredData = [];
 
 /** Get NUM_CATEGORIES random category from API.
  *
  * Returns array of category ids
  */
 
+// function getCategoryIds(num) {
+//   const catIdxs = randomizeSelection(fullCatArr, num);
+//   const idArr = [];
+
+//   catIdxs.forEach((val) => {
+//     idArr.push(fullCatArr[val].id);
+//   });
+//   return idArr;
+// }
+
 function getCategoryIds() {}
+
+getCategoryIds();
+
+// getCategoryIds();
 
 /** Return object with data about a category:
  
@@ -127,20 +143,21 @@ function getCategory(catId) {}
 //     }
 //   }
 // }
-async function fillTable(HTMLdata) {
-  HTMLdata = await setupAndStart();
+async function fillTable() {
+  await setupAndStart();
   const table = $("table");
 
   //creating the table head
   const trHead = $("<tr>");
-  HTMLdata.forEach((d) => {
-    const th = $(`<th>${d.title}</th>`);
+  // trHead.setAttribute("id", "categories");
+  categoriesArr.forEach((d) => {
+    const th = $(`<th>${d.title.toUpperCase()}</th>`);
+
     trHead.append(th);
   });
   table.append(trHead);
 
-  // structure the data
-  const structuredData = [
+  let structuredData = [
     [1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1],
     [1, 1, 1, 1, 1, 1],
@@ -148,31 +165,37 @@ async function fillTable(HTMLdata) {
     [1, 1, 1, 1, 1, 1],
   ];
 
-  for (let i = 0; i < HTMLdata.length; i++) {
-    const c = HTMLdata[i];
+  for (let i = 0; i < categoriesArr.length; i++) {
+    const c = categoriesArr[i];
     for (let j = 0; j < c.clues.length; j++) {
       structuredData[j][i] = c.clues[j];
     }
   }
 
-  // obendesmond2@gmail
-
   structuredData.forEach((d) => {
     const trRow = $("<tr>");
+
     d.forEach((clue) => {
-      const th = `<td>${clue.question}<td>`;
-      trRow.append(th);
+      const td = document.createElement("td");
+      td.innerHTML = "?";
+      trRow.append(td);
     });
     table.append(trRow);
   });
+
+  console.log(structuredData);
+  return structuredData;
 }
+
+fillTable();
+
 // $(`<td>
 //        <div><p class="mark">?</p></div>
 //       </td>`);
-// `<td>${clue.question}<td>`;
+// `<td >${clue.question}<td>`;
 // `<td>${clue.answer}<td>`;
 
-fillTable();
+// fillTable();
 //
 
 /** Handle clicking on a clue: show the question or answer.
@@ -183,12 +206,30 @@ fillTable();
  * - if currently "answer", ignore click
  * */
 
-// input.addEventListener("keyup", searchHandler);
+async function handleClick(evt) {
+  let td = evt.target.td;
 
-// suggestions.addEventListener("click", useSuggestion);
+  if (structuredData[j][i].showing === "null") {
+    td.innerHTML === "?";
+  }
 
-function handleClick(evt) {
-  $("td").on("click", fillTable);
+  if (td.innerHTML === "?") {
+    td.innerHTML = structuredData[j][i].question;
+    structuredData[j][i].showing = "question";
+  }
+  if ((td.innerHTML = structuredData[j][i].question)) {
+    td.innerHTML = structuredData[j][i].answer;
+    structuredData[j][i].showing = "answer";
+  } else {
+    return;
+  }
+}
+
+handleClick();
+async function start() {
+  $("body").on("click", "td", (evt) => {
+    handleClick(evt);
+  });
 }
 
 /** Wipe the current Jeopardy board, show the loading spinner,
@@ -208,13 +249,16 @@ function hideLoadingView() {}
  * - create HTML table
  * */
 
+// https://drive.google.com/drive/folders/1XuNgh5v9hN3GZg4vrYX6WpctPg7X43k_
+
 async function setupAndStart() {
+  // let categoriesArr = [];
   const baseUrl = "https://jservice.io/api";
   const res = await axios.get(baseUrl + "/categories?count=100");
 
   const sixCategories = _.sampleSize(res.data, 6);
 
-  let array = [];
+  // let array = [];
 
   for (let category of sixCategories) {
     // get 5 questions for this category
@@ -225,7 +269,7 @@ async function setupAndStart() {
       clue.showing = "null";
     }
 
-    array.push({
+    categoriesArr.push({
       title: category.title,
       clues: cluesQNA,
       id: category.id,
@@ -242,66 +286,5 @@ async function setupAndStart() {
   $("body").prepend(btn);
   $("body").prepend(h1);
 
-  return array;
+  return categoriesArr;
 }
-
-//
-
-//
-
-// tds = $("td");
-// tdArray = Array.from(tds);
-
-// const col1 = tdArray.filter(function (el) {
-//       (el.hasClass("col-1"));
-//   });
-// if (tdArray[i].hasClass("col-1")) {
-
-// }
-
-//
-
-// async function setupAndStart() {
-//   const baseUrl = "https://jservice.io/api";
-//   const res = await axios.get(baseUrl + "/categories?count=100");
-
-//   const sixCategories = _.sampleSize(res.data, 6);
-
-//   let array = [];
-
-//   for (let category of sixCategories) {
-//     // get 5 questions for this category
-//     const catData = await axios.get(baseUrl + "/category?id=" + category.id);
-//     const clues = catData.data.clues.slice(0, 5);
-
-//     array.push({
-//       title: category.title,
-//       clues,
-//       id: category.id,
-//     });
-//   }
-
-//   const body = document.querySelector("body");
-//   let ths = "";
-//   for (let i = 0; i < array.length; i++) {
-//     ths += `<th>${array[i].title}</th>`;
-//   }
-
-//   // put categories on table head
-//   body.innerHTML += `
-//     <table>
-//        <thead>
-//         <tr>
-//           ${ths}
-//          </tr>
-//       </thead>
-//   `;
-
-//   body.innerHTML += "</table>";
-//   ths = "";
-
-//
-//
-/** On page load, add event handler for clicking clues */
-
-// TODO
