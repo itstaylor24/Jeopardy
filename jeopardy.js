@@ -18,30 +18,28 @@
 //    ...
 //  ]
 
-let categoriesArr = [];
-
-let structuredData = [];
+let categories = [];
+const h1 = $("<h1>Jeopardy!</h1>");
+const btn = $("<button>Start!</button>");
+$("body").prepend(btn);
+$("body").prepend(h1);
 
 /** Get NUM_CATEGORIES random category from API.
  *
  * Returns array of category ids
  */
 
-// function getCategoryIds(num) {
-//   const catIdxs = randomizeSelection(fullCatArr, num);
-//   const idArr = [];
+async function getCategoryIds() {
+  const baseUrl = "https://jservice.io/api";
+  const res = await axios.get(baseUrl + "/categories?count=100");
 
-//   catIdxs.forEach((val) => {
-//     idArr.push(fullCatArr[val].id);
-//   });
-//   return idArr;
-// }
+  const sixCategories = _.sampleSize(res.data, 6);
+  const catIds = sixCategories.map((category) => category.id);
 
-function getCategoryIds() {}
+  return catIds;
+}
 
 getCategoryIds();
-
-// getCategoryIds();
 
 /** Return object with data about a category:
  
@@ -55,8 +53,21 @@ getCategoryIds();
  *   ]
  */
 
-function getCategory(catId) {}
+async function getCategory(catId) {
+  const catData = await axios.get(
+    `https://jservice.io/api/category?id=${catId}`
+  );
 
+  const cluesQNA = catData.data.clues.slice(0, 5);
+  for (let clue of cluesQNA) {
+    clue.showing = "null";
+  }
+
+  return {
+    title: catData.data.title,
+    clues: cluesQNA,
+  };
+}
 /** Fill the HTML table#jeopardy with the categories & cells for questions.
  *
  * - The <thead> should be filled w/a <tr>, and a <td> for each category
@@ -66,51 +77,40 @@ function getCategory(catId) {}
  */
 
 //
-async function fillTable() {
-  await setupAndStart();
-  const table = $("table");
+function fillTable() {
+  const $table = $("<table>");
+  const $tHead = $("<thead>");
+  const $tbody = $("<tbody>");
 
   //creating the table head
-  const trHead = $("<tr>");
+  const $trHead = $("<tr>");
   // trHead.setAttribute("id", "categories");
-  categoriesArr.forEach((d) => {
-    const th = $(`<th>${d.title.toUpperCase()}</th>`);
+  categories.forEach((category) => {
+    const $th = $(`<th>${category.title.toUpperCase()}</th>`);
 
-    trHead.append(th);
+    $trHead.append($th);
   });
-  table.append(trHead);
+  $tHead.append($trHead);
+  $table.append($tHead, $tbody);
 
-  let structuredData = [
-    [1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1],
-  ];
+  $("body").append($table);
 
-  structuredData.forEach((d) => {
-    const trRow = $("<tr>");
-    let td = "";
-    for (let catIdx = 0; catIdx < categoriesArr.length; catIdx++) {
-      const qna = categoriesArr[catIdx];
-
-      for (let clueIdx = 0; clueIdx < qna.clues.length; clueIdx++) {
-        structuredData[clueIdx[catIdx]] = qna.clues[clueIdx];
-        td = $(`<td id =${qna.clues[clueIdx].id}>`);
-        td.text("?");
-      }
-      trRow.append(td);
-
-      table.append(trRow);
+  for (let clueIdx = 0; clueIdx < 5; clueIdx++) {
+    let $trRow = $("<tr>");
+    for (let catIdx = 0; catIdx < categories.length; catIdx++) {
+      $trRow.append($("<td>").attr("id", `${catIdx}-${clueIdx}`).text("?"));
     }
-  });
+    $tbody.append($trRow);
+  }
 }
+
+// fillTable();
 
 // });
 // `${clue.question}`;
 // `${clue.answer}`;
 
-fillTable();
+// fillTable();
 
 /** Handle clicking on a clue: show the question or answer.
  *
@@ -121,30 +121,23 @@ fillTable();
  * */
 
 async function handleClick(evt) {
-  $("td").on(
-    "click",
-    await fillTable()
-    //   // for (let i = 0; i < categoriesArr.length; i++) {
-    //   //   const c = categoriesArr[i];
-    //   //   for (let j = 0; j < c.clues.length; j++) {
-    //       structuredData[clueIdx][catIdx] = qna.clues[clueIdx];
-    // if (qna.clues[clueIdx].showing === "null") {
-    //   td.innerHTML === "?";
-    // }
-    // if (
-    //   c.clues[clueIdx].showing === "null"
-    //   // td.innerHTML === "?" &&
-    //   document.getElementById(`${qna.clues[idx].id}`)
-    // ) {
-    //   td.innerHTML = qna.clues[idx].question;
-    //   qna.clues[idx].showing = "question";
-    // }
-    // if ((td.innerHTML = qna.clues[idx].question)) {
-    //   td.innerHTML = qna.clues[idx].answer;
-    //   qna.clues[idx].showing = "answer";
-    // } else {
-    //   return;
-  );
+  let id = evt.target.id;
+
+  let [catId, clueId] = id.split("-");
+  let clue = categories[catId].clues[clueId];
+  let show;
+
+  if (clue.showing === "null") {
+    show = clue.question;
+    clue.showing = "question";
+  } else if (clue.showing === "question") {
+    show = clue.answer;
+    clue.showing = "answer";
+  } else {
+    return;
+  }
+
+  $(`#${catId}-${clueId}`).html(show);
 }
 
 // handleClick();
@@ -153,7 +146,7 @@ async function handleClick(evt) {
  * and update the button used to fetch data.
  */
 
-function showLoadingView() {}
+// }
 
 /** Remove the loading spinner and update the button used to fetch data. */
 
@@ -169,39 +162,25 @@ function hideLoadingView() {}
 // https://drive.google.com/drive/folders/1XuNgh5v9hN3GZg4vrYX6WpctPg7X43k_
 
 async function setupAndStart() {
-  // let categoriesArr = [];
-  const baseUrl = "https://jservice.io/api";
-  const res = await axios.get(baseUrl + "/categories?count=100");
+  catsInfo = await getCategoryIds();
 
-  const sixCategories = _.sampleSize(res.data, 6);
-
-  // let array = [];
-
-  for (let category of sixCategories) {
-    // get 5 questions for this category
-    const catData = await axios.get(baseUrl + "/category?id=" + category.id);
-    const cluesQNA = catData.data.clues.slice(0, 5);
-
-    for (let clue of cluesQNA) {
-      clue.showing = "null";
-    }
-
-    categoriesArr.push({
-      title: category.title,
-      clues: cluesQNA,
-      id: category.id,
-    });
+  for (let catInfo of catsInfo) {
+    categories.push(await getCategory(catInfo));
   }
-
-  // prepend table as first child of body
-  const table = $("<table>");
-  $("body").prepend(table);
-
-  // add heading and button
-  const h1 = $("<h1>Jeopardy!</h1>");
-  const btn = $("<button>Start!</button>");
-  $("body").prepend(btn);
-  $("body").prepend(h1);
-
-  return categoriesArr;
+  fillTable();
 }
+
+$("body").on("click", "td", handleClick);
+
+async function start() {
+  btn.on("click", function () {
+    if (btn.html("Start!")) {
+      btn.html("Restart");
+    } else {
+      btn.html("Start!");
+    }
+    setupAndStart();
+  });
+}
+
+start();
