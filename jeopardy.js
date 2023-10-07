@@ -65,84 +65,7 @@ function getCategory(catId) {}
  *   (initally, just show a "?" where the question/answer would go.)
  */
 
-// async function fillTable(HTMLdata) {
-//   HTMLdata = await setupAndStart();
-//   console.log(HTMLdata);
-//   const table = $("table");
-//   const tHead = $("<thead>");
-//   const trHead = $("<tr>");
-//   const th1 = $("<th>");
-//   const th2 = $("<th>");
-//   const th3 = $("<th>");
-//   const th4 = $("<th>");
-//   const th5 = $("<th>");
-//   const th6 = $("<th>");
-//   const tbody = $("<tbody>");
-//   const tr1 = $("<tr>");
-//   const tr2 = $("<tr>");
-//   const tr3 = $("<tr>");
-//   const tr4 = $("<tr>");
-//   const tr5 = $("<tr>");
-
-//   table.append(tHead, tbody);
-//   tHead.append(trHead);
-//   trHead.append(th1, th2, th3, th4, th5, th6);
-//   tbody.append(tr1, tr2, tr3, tr4, tr5);
-
-//   ths = [th1, th2, th3, th4, th5, th6];
-
-//   const categoryArr = [];
-
-//   for (let i = 0; i < HTMLdata.length; i++) {
-//     console.log(HTMLdata[i]);
-//     categoryArr.push(HTMLdata[i].title);
-//     for (let j = 0; j < ths.length; j++) {
-//       if (i === j) {
-//         ths[j].text(`${categoryArr[i]}`);
-//         ths[j].attr("id", HTMLdata[i].id);
-//       }
-//     }
-//   }
-
-//   const trs = [tr1, tr2, tr3, tr4, tr5];
-
-//   for (let tr of trs) {
-//     $("<td class='col-1'></td>").appendTo(tr);
-//     $("<td class='col-2'></td>").appendTo(tr);
-//     $("<td class='col-3'></td>").appendTo(tr);
-//     $("<td class='col-4'></td>").appendTo(tr);
-//     $("<td class='col-5'></td>").appendTo(tr);
-//     $("<td class='col-6'></td>").appendTo(tr);
-
-//     const col1 = Array.from($(".col-1"));
-
-//     col1QNA = [];
-
-//     const col2 = Array.from($(".col-2"));
-//     col2QNA = [];
-
-//     const col3 = Array.from($(".col-3"));
-//     col3QNA = [];
-
-//     const col4 = Array.from($(".col-4"));
-//     col4QNA = [];
-
-//     const col5 = Array.from($(".col-5"));
-//     col5QNA = [];
-
-//     const col6 = Array.from($(".col-6"));
-//     col6QNA = [];
-
-//     for (let clueObj of HTMLdata) {
-//       const cluesInfo = clueObj.clues;
-//       for (let clueInfo of cluesInfo) {
-//         if ((clueInfo.showing = "null")) {
-//           $("td").text("?");
-//         }
-//       }
-//     }
-//   }
-// }
+//
 async function fillTable() {
   await setupAndStart();
   const table = $("table");
@@ -165,26 +88,25 @@ async function fillTable() {
     [1, 1, 1, 1, 1, 1],
   ];
 
-  for (let i = 0; i < categoriesArr.length; i++) {
-    const c = categoriesArr[i];
-    for (let j = 0; j < c.clues.length; j++) {
-      structuredData[j][i] = c.clues[j];
-    }
-  }
-
   structuredData.forEach((d) => {
     const trRow = $("<tr>");
+    let td = "";
+    for (let catIdx = 0; catIdx < categoriesArr.length; catIdx++) {
+      const qna = categoriesArr[catIdx];
 
-    d.forEach((clue) => {
-      const td = document.createElement("td");
-      td.innerHTML = "?";
+      for (let clueIdx = 0; clueIdx < qna.clues.length; clueIdx++) {
+        structuredData[clueIdx[catIdx]] = qna.clues[clueIdx];
+        td = $(`<td id =${qna.clues[clueIdx].id}>`);
+        td.text("?");
+      }
       trRow.append(td);
-    });
-    table.append(trRow);
-  });
 
-  return structuredData;
+      table.append(trRow);
+    }
+  });
 }
+
+// });
 // `${clue.question}`;
 // `${clue.answer}`;
 
@@ -199,27 +121,33 @@ fillTable();
  * */
 
 async function handleClick(evt) {
-  $("td").on("click", function () {
-    console.log("clicked!");
-
-    if (structuredData[j][i].showing === "null") {
-      td.innerHTML === "?";
-    }
-
-    if (td.innerHTML === "?") {
-      td.innerHTML = structuredData[j][i].question;
-      structuredData[j][i].showing = "question";
-    }
-    if ((td.innerHTML = structuredData[j][i].question)) {
-      td.innerHTML = structuredData[j][i].answer;
-      structuredData[j][i].showing = "answer";
-    } else {
-      return;
-    }
-  });
+  $("td").on(
+    "click",
+    await fillTable()
+    //   // for (let i = 0; i < categoriesArr.length; i++) {
+    //   //   const c = categoriesArr[i];
+    //   //   for (let j = 0; j < c.clues.length; j++) {
+    //       structuredData[clueIdx][catIdx] = qna.clues[clueIdx];
+    // if (qna.clues[clueIdx].showing === "null") {
+    //   td.innerHTML === "?";
+    // }
+    // if (
+    //   c.clues[clueIdx].showing === "null"
+    //   // td.innerHTML === "?" &&
+    //   document.getElementById(`${qna.clues[idx].id}`)
+    // ) {
+    //   td.innerHTML = qna.clues[idx].question;
+    //   qna.clues[idx].showing = "question";
+    // }
+    // if ((td.innerHTML = qna.clues[idx].question)) {
+    //   td.innerHTML = qna.clues[idx].answer;
+    //   qna.clues[idx].showing = "answer";
+    // } else {
+    //   return;
+  );
 }
 
-handleClick();
+// handleClick();
 
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
