@@ -163,6 +163,7 @@ function hideLoadingView() {}
 
 async function setupAndStart() {
   catsInfo = await getCategoryIds();
+  categories = [];
 
   for (let catInfo of catsInfo) {
     categories.push(await getCategory(catInfo));
@@ -179,6 +180,13 @@ async function start() {
     } else {
       btn.html("Start!");
     }
+
+    const tb = document.querySelector("table");
+    console.log(tb);
+    if (tb) {
+      tb.remove();
+    }
+
     setupAndStart();
   });
 }
